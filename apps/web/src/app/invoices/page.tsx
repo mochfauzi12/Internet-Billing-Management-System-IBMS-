@@ -8,13 +8,15 @@ import { Button } from '@/components/ui/button';
 import { StatusBadge } from '@/components/ui/badge';
 import { ConfirmDialog } from '@/components/modules/confirm-dialog';
 import { MOCK_INVOICES, MOCK_CUSTOMERS, MockInvoice } from '@/lib/mock-data';
-import { Search, RefreshCw, Eye, MessageSquare, FileText, Calendar } from 'lucide-react';
+import { Search, RefreshCw, MessageSquare, FileText, Calendar } from 'lucide-react';
 import { WhatsAppPreviewModal } from '@/components/modules/whatsapp-preview-modal';
 
 export default function InvoicesPage() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [invoices, setInvoices] = useState<MockInvoice[]>(MOCK_INVOICES);
   const [searchTerm, setSearchTerm] = useState('');
+
+  // Free flexible Month & Year selection
   const [monthFilter, setMonthFilter] = useState('Mei');
   const [yearFilter, setYearFilter] = useState('2026');
   const [statusFilter, setStatusFilter] = useState('');
@@ -29,7 +31,8 @@ export default function InvoicesPage() {
     'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
   ];
 
-  const years = ['2026', '2025', '2024', '2023'];
+  // Dynamic generate full array of years (2020 through 2035) + allows direct typing
+  const yearOptions = Array.from({ length: 16 }, (_, i) => String(2020 + i));
 
   const filteredInvoices = invoices.filter((inv) => {
     const matchesSearch =
@@ -42,7 +45,7 @@ export default function InvoicesPage() {
   const handleGenerateInvoices = () => {
     setIsGenerating(true);
     setTimeout(() => {
-      // Generate invoices for active customers who don't have an invoice for this period
+      // Generate invoices for active customers for the exact selected custom period
       const newInvoices: MockInvoice[] = MOCK_CUSTOMERS.filter((c) => c.status === 'Aktif').map((cust, idx) => ({
         id: Date.now() + idx,
         invoiceNumber: `INV-${yearFilter}-${String(months.indexOf(monthFilter) + 1).padStart(2, '0')}-000${idx + 1}`,
@@ -71,7 +74,7 @@ export default function InvoicesPage() {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Tagihan Pelanggan (Invoices)</h1>
-              <p className="text-xs sm:text-sm text-gray-500">Kelola dan buat invoice tagihan bulanan untuk pelanggan ISP</p>
+              <p className="text-xs sm:text-sm text-gray-500">Kelola dan buat invoice tagihan bulanan bebas untuk pelanggan ISP</p>
             </div>
             <Button
               variant="primary"
@@ -79,11 +82,11 @@ export default function InvoicesPage() {
               onClick={() => setIsGenerateModalOpen(true)}
             >
               <RefreshCw className="w-4 h-4" />
-              Generate Tagihan Bulanan
+              Generate Tagihan Bulanan ({monthFilter} {yearFilter})
             </Button>
           </div>
 
-          {/* Filter & Toolbar */}
+          {/* Filter & Toolbar dengan Pilihan Periode Bebas */}
           <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col md:flex-row gap-4 items-center justify-between">
             <div className="relative w-full md:w-80">
               <Search className="w-4 h-4 absolute left-3 top-3 text-gray-400" />
@@ -97,32 +100,46 @@ export default function InvoicesPage() {
             </div>
 
             <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
-              <div className="flex items-center gap-1.5 text-xs text-gray-500 font-semibold">
+              <div className="flex items-center gap-1.5 text-xs text-gray-700 font-bold bg-blue-50 px-2.5 py-1.5 rounded-lg border border-blue-100">
                 <Calendar className="w-3.5 h-3.5 text-blue-600" />
-                <span>Periode:</span>
+                <span>Pilih Periode Bebas:</span>
               </div>
 
-              {/* Dropdown Bulan Dinamis */}
+              {/* Pilihan Bulan Bebas */}
               <select
                 value={monthFilter}
                 onChange={(e) => setMonthFilter(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-lg text-xs bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                className="px-3 py-2 border border-gray-300 rounded-lg text-xs bg-white font-medium focus:ring-2 focus:ring-blue-500 focus:outline-none cursor-pointer"
               >
                 {months.map((m) => (
                   <option key={m} value={m}>Bulan {m}</option>
                 ))}
               </select>
 
-              {/* Dropdown Tahun Dinamis */}
-              <select
-                value={yearFilter}
-                onChange={(e) => setYearFilter(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-lg text-xs bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none font-bold"
-              >
-                {years.map((y) => (
-                  <option key={y} value={y}>Tahun {y}</option>
-                ))}
-              </select>
+              {/* Input & Dropdown Tahun Bebas (User-defined Custom Year) */}
+              <div className="flex items-center gap-1">
+                <select
+                  value={yearOptions.includes(yearFilter) ? yearFilter : 'custom'}
+                  onChange={(e) => {
+                    if (e.target.value !== 'custom') setYearFilter(e.target.value);
+                  }}
+                  className="px-3 py-2 border border-gray-300 rounded-lg text-xs bg-white font-bold text-gray-900 focus:ring-2 focus:ring-blue-500 focus:outline-none cursor-pointer"
+                >
+                  {yearOptions.map((y) => (
+                    <option key={y} value={y}>Tahun {y}</option>
+                  ))}
+                  <option value="custom">Ketik Tahun Lain...</option>
+                </select>
+
+                <input
+                  type="number"
+                  placeholder="Ketik Tahun..."
+                  value={yearFilter}
+                  onChange={(e) => setYearFilter(e.target.value)}
+                  className="w-24 px-2.5 py-1.5 border border-gray-300 rounded-lg text-xs font-bold text-blue-600 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  title="Ketik tahun berapa saja secara bebas"
+                />
+              </div>
 
               {/* Status Filter */}
               <select
@@ -159,7 +176,9 @@ export default function InvoicesPage() {
                       <td className="px-6 py-4 font-mono text-xs font-bold text-blue-600">{inv.invoiceNumber}</td>
                       <td className="px-6 py-4 font-semibold text-gray-900">{inv.customerName}</td>
                       <td className="px-6 py-4 text-xs text-gray-600">{inv.packageName}</td>
-                      <td className="px-6 py-4 text-xs text-gray-500">{inv.period}</td>
+                      <td className="px-6 py-4 text-xs font-semibold text-blue-700 bg-blue-50/50 px-2 py-1 rounded-md inline-block my-2">
+                        {inv.period}
+                      </td>
                       <td className="px-6 py-4 font-bold text-gray-900">Rp {inv.total.toLocaleString('id-ID')}</td>
                       <td className="px-6 py-4">
                         <StatusBadge status={inv.status} />
@@ -204,7 +223,7 @@ export default function InvoicesPage() {
         isOpen={isGenerateModalOpen}
         onClose={() => setIsGenerateModalOpen(false)}
         title={`Generate Tagihan Bulanan (${monthFilter} ${yearFilter})`}
-        message={`Sistem akan otomatis membuat tagihan untuk semua pelanggan berstatus AKTIF pada periode ${monthFilter} ${yearFilter}. Pelanggan yang sudah memiliki tagihan akan di-skip. Lanjutkan?`}
+        message={`Sistem akan otomatis membuat tagihan untuk semua pelanggan berstatus AKTIF pada periode bebas ${monthFilter} ${yearFilter}. Lanjutkan?`}
         confirmText="Generate Sekarang"
         variant="primary"
         onConfirm={handleGenerateInvoices}
