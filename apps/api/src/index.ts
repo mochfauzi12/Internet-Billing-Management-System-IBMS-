@@ -10,8 +10,10 @@ import { paymentRoutes } from './controllers/payment.controller';
 import { dashboardRoutes } from './controllers/dashboard.controller';
 import { reminderRoutes } from './controllers/reminder.controller';
 import { userRoutes } from './controllers/user.controller';
+import { reportRoutes } from './controllers/report.controller';
 import { processWaReminderQueue } from './queue/wa-reminder.consumer';
 import { handleMonthlyBillingCron } from './cron/monthly-billing.cron';
+import { handleDailyOverdueCheckCron } from './cron/overdue-check.cron';
 
 const app = new Hono<{ Bindings: Env }>();
 
@@ -31,11 +33,16 @@ app.route('/api/payments', paymentRoutes);
 app.route('/api/dashboard', dashboardRoutes);
 app.route('/api/reminders', reminderRoutes);
 app.route('/api/users', userRoutes);
+app.route('/api/reports', reportRoutes);
 
 export default {
   fetch: app.fetch,
   async scheduled(event: ScheduledEvent, env: Env, ctx: ExecutionContext) {
-    ctx.waitUntil(handleMonthlyBillingCron(event, env));
+    if (event.cron === '0 17 1 * *') {
+      ctx.waitUntil(handleMonthlyBillingCron(event, env));
+    } else {
+      ctx.waitUntil(handleDailyOverdueCheckCron(event, env));
+    }
   },
   async queue(batch: MessageBatch<any>, env: Env): Promise<void> {
     await processWaReminderQueue(batch, env);

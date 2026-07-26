@@ -34,9 +34,9 @@ export default function ReportsPage() {
 
   const handleExport = (type: 'excel' | 'pdf') => {
     if (type === 'excel') {
-      alert('Mengekspor laporan dalam format Excel (.xlsx) via SheetJS...');
+      window.open('http://localhost:8787/api/reports/export?type=excel', '_blank');
     } else {
-      alert('Mengekspor laporan PDF via Cloudflare Browser Rendering API...');
+      window.print();
     }
   };
 
