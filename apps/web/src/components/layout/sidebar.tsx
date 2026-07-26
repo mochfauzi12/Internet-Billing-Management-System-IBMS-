@@ -52,12 +52,18 @@ export function Sidebar({ isOpen, onClose, currentPath = '/dashboard' }: Sidebar
     }
   };
 
+  const handleItemClick = () => {
+    if (onClose) {
+      onClose();
+    }
+  };
+
   const navContent = (
-    <div className="h-full flex flex-col justify-between p-4">
+    <div className="h-full flex flex-col justify-between p-4 overflow-y-auto">
       <div>
-        <div className="flex items-center justify-between mb-8 px-2">
+        <div className="flex items-center justify-between mb-6 px-1 pt-1">
           <div className="flex items-center gap-2.5">
-            <div className="p-2 bg-blue-600 rounded-lg text-white shadow-md flex items-center justify-center min-w-[36px] min-h-[36px]">
+            <div className="p-2 bg-blue-600 rounded-xl text-white shadow-md flex items-center justify-center min-w-[36px] min-h-[36px]">
               {getLogoIcon()}
             </div>
             <div className="overflow-hidden">
@@ -68,7 +74,11 @@ export function Sidebar({ isOpen, onClose, currentPath = '/dashboard' }: Sidebar
             </div>
           </div>
           {onClose && (
-            <button onClick={onClose} className="lg:hidden p-1.5 text-gray-500 hover:bg-gray-100 rounded-lg">
+            <button
+              onClick={onClose}
+              className="lg:hidden p-2 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-xl transition-colors"
+              aria-label="Tutup Menu"
+            >
               <X className="w-5 h-5" />
             </button>
           )}
@@ -82,9 +92,10 @@ export function Sidebar({ isOpen, onClose, currentPath = '/dashboard' }: Sidebar
               <a
                 key={item.label}
                 href={item.href}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                onClick={handleItemClick}
+                className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all ${
                   isActive
-                    ? 'bg-blue-50 text-blue-600 font-bold'
+                    ? 'bg-blue-50 text-blue-600 font-bold shadow-xs'
                     : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
                 }`}
               >
@@ -109,7 +120,7 @@ export function Sidebar({ isOpen, onClose, currentPath = '/dashboard' }: Sidebar
         </div>
         <button
           onClick={handleLogout}
-          className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+          className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-colors"
           title="Logout"
         >
           <LogOut className="w-4 h-4" />
@@ -125,11 +136,17 @@ export function Sidebar({ isOpen, onClose, currentPath = '/dashboard' }: Sidebar
         {navContent}
       </aside>
 
-      {/* Mobile / Tablet Off-Canvas Overlay Drawer */}
+      {/* Mobile / Tablet Off-Canvas Overlay Drawer (Z-INDEX 100 HIGH PRIORITY) */}
       {isOpen && (
-        <div className="fixed inset-0 z-50 lg:hidden flex">
-          <div className="fixed inset-0 bg-gray-900/50 backdrop-blur-xs" onClick={onClose} />
-          <aside className="relative w-64 max-w-[80vw] bg-white h-full z-10 shadow-2xl flex flex-col">
+        <div className="fixed inset-0 z-[100] lg:hidden flex">
+          {/* Backdrop Blur Overlay */}
+          <div
+            className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity"
+            onClick={onClose}
+          />
+
+          {/* Drawer Sheet Content */}
+          <aside className="relative w-[280px] max-w-[85vw] bg-white h-full z-[101] shadow-2xl flex flex-col animate-in slide-in-from-left duration-300">
             {navContent}
           </aside>
         </div>
