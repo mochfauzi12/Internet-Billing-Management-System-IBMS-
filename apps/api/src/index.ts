@@ -11,6 +11,7 @@ import { dashboardRoutes } from './controllers/dashboard.controller';
 import { reminderRoutes } from './controllers/reminder.controller';
 import { userRoutes } from './controllers/user.controller';
 import { reportRoutes } from './controllers/report.controller';
+import { settingRoutes } from './controllers/setting.controller';
 import { processWaReminderQueue } from './queue/wa-reminder.consumer';
 import { handleMonthlyBillingCron } from './cron/monthly-billing.cron';
 import { handleDailyOverdueCheckCron } from './cron/overdue-check.cron';
@@ -34,6 +35,7 @@ app.route('/api/dashboard', dashboardRoutes);
 app.route('/api/reminders', reminderRoutes);
 app.route('/api/users', userRoutes);
 app.route('/api/reports', reportRoutes);
+app.route('/api/settings', settingRoutes);
 
 export default {
   fetch: app.fetch,

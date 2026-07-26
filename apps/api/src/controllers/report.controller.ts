@@ -7,14 +7,24 @@ export const reportRoutes = new Hono<{ Bindings: Env }>();
 reportRoutes.get('/export', async (c) => {
   const container = createContainer(c.env);
   const type = c.req.query('type') || 'excel';
+  const startDate = c.req.query('startDate');
+  const endDate = c.req.query('endDate');
 
-  const invoices = await container.invoiceRepository.findMany({ limit: 1000 });
-  const customers = await container.customerRepository.findMany({ limit: 1000 });
+  let invoices = (await container.invoiceRepository.findMany({ limit: 1000 })).data;
+  const customers = (await container.customerRepository.findMany({ limit: 1000 })).data;
+
+  // Filter by date range if provided
+  if (startDate) {
+    invoices = invoices.filter((inv) => inv.dueDate >= startDate);
+  }
+  if (endDate) {
+    invoices = invoices.filter((inv) => inv.dueDate <= endDate);
+  }
 
   // Map customer map for easy lookup
-  const customerMap = new Map(customers.data.map((item) => [item.id, item.name]));
+  const customerMap = new Map(customers.map((item) => [item.id, item.name]));
 
-  const reportData = invoices.data.map((inv) => ({
+  const reportData = invoices.map((inv) => ({
     'No. Invoice': inv.invoiceNumber,
     Pelanggan: customerMap.get(inv.customerId) || `Pelanggan #${inv.customerId}`,
     'Periode Bulan': inv.billingMonth,
