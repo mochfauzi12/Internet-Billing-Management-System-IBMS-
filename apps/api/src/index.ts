@@ -1,6 +1,16 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
-import { Env, createContainer } from './container';
+import { Env } from './container';
+
+import { authRoutes } from './controllers/auth.controller';
+import { customerRoutes } from './controllers/customer.controller';
+import { packageRoutes } from './controllers/package.controller';
+import { invoiceRoutes } from './controllers/invoice.controller';
+import { paymentRoutes } from './controllers/payment.controller';
+import { dashboardRoutes } from './controllers/dashboard.controller';
+import { reminderRoutes } from './controllers/reminder.controller';
+import { processWaReminderQueue } from './queue/wa-reminder.consumer';
+import { handleMonthlyBillingCron } from './cron/monthly-billing.cron';
 
 const app = new Hono<{ Bindings: Env }>();
 
@@ -11,20 +21,21 @@ app.get('/health', (c) => {
   return c.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-// API Routes
-app.get('/api/customers', async (c) => {
-  const container = createContainer(c.env);
-  const search = c.req.query('search');
-  const result = await container.customerRepository.findMany({ search });
-  return c.json(result);
-});
+// Mounting Controllers
+app.route('/api/auth', authRoutes);
+app.route('/api/customers', customerRoutes);
+app.route('/api/packages', packageRoutes);
+app.route('/api/invoices', invoiceRoutes);
+app.route('/api/payments', paymentRoutes);
+app.route('/api/dashboard', dashboardRoutes);
+app.route('/api/reminders', reminderRoutes);
 
 export default {
   fetch: app.fetch,
   async scheduled(event: ScheduledEvent, env: Env, ctx: ExecutionContext) {
-    console.log('Cron triggered: Generating monthly invoices...', event.cron);
+    ctx.waitUntil(handleMonthlyBillingCron(event, env));
   },
   async queue(batch: MessageBatch<any>, env: Env): Promise<void> {
-    console.log('Queue triggered: Processing WA reminders...', batch.messages.length);
+    await processWaReminderQueue(batch, env);
   },
 };

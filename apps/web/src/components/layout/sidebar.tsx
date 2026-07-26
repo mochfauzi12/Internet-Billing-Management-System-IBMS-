@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import { Wifi, LayoutDashboard, Users, Package, FileText, CreditCard, Bell, BarChart3, Settings } from 'lucide-react';
 

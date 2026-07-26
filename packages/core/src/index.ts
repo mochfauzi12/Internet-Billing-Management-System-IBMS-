@@ -17,6 +17,7 @@ export * from './domain/services/whatsapp.service.interface';
 export * from './domain/services/storage.service.interface';
 export * from './domain/services/cache.service.interface';
 export * from './domain/services/pdf-generator.service.interface';
+export * from './domain/services/crypto.service';
 
 // Domain Errors
 export * from './domain/errors/domain.error';
