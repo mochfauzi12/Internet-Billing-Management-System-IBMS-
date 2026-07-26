@@ -5,7 +5,7 @@ import { Sidebar } from '@/components/layout/sidebar';
 import { Topbar } from '@/components/layout/topbar';
 import { BottomNav } from '@/components/layout/bottom-nav';
 import { Button } from '@/components/ui/button';
-import { Building2, CreditCard, Key, Save, CheckCircle2, Wifi, Globe, Zap, Radio } from 'lucide-react';
+import { Building2, CreditCard, Key, Save, CheckCircle2, Wifi, Globe, Zap, Radio, Upload, Image as ImageIcon, Trash2 } from 'lucide-react';
 import { getIspSettings, saveIspSettings, IspSettings } from '@/lib/settings-store';
 
 export default function SettingsPage() {
@@ -19,6 +19,7 @@ export default function SettingsPage() {
     companyPhone: '0812-0000-9999',
     companyEmail: 'info@netisp.id',
     logoType: 'wifi',
+    customLogoUrl: '',
     bcaAccount: '123-456-7890',
     bcaName: 'PT NetISP Network Indonesia',
     mandiriAccount: '098-765-4321',
@@ -37,6 +38,27 @@ export default function SettingsPage() {
     setTimeout(() => setIsSaved(false), 3000);
   };
 
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      alert('Mohon pilih file gambar berformat PNG, JPG, atau SVG.');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const dataUrl = event.target?.result as string;
+      setSettings({
+        ...settings,
+        logoType: 'custom',
+        customLogoUrl: dataUrl,
+      });
+    };
+    reader.readAsDataURL(file);
+  };
+
   return (
     <div className="flex min-h-screen bg-gray-50 font-sans">
       <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} currentPath="/settings" />
@@ -46,11 +68,11 @@ export default function SettingsPage() {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Pengaturan Sistem & Profil ISP</h1>
-              <p className="text-xs sm:text-sm text-gray-500">Kustomisasi identitas ISP, logo, rekening pembayaran bank, dan integrasi WhatsApp</p>
+              <p className="text-xs sm:text-sm text-gray-500">Kustomisasi logo PNG sendiri, profil ISP, rekening bank, dan integrasi WhatsApp</p>
             </div>
             {isSaved && (
               <div className="flex items-center gap-2 text-emerald-600 bg-emerald-50 px-3.5 py-2 rounded-xl text-xs font-bold border border-emerald-200">
-                <CheckCircle2 className="w-4 h-4" /> Pengaturan Tersimpan & Terintegrasi ke Invoice!
+                <CheckCircle2 className="w-4 h-4" /> Pengaturan & Logo PNG Berhasil Disimpan!
               </div>
             )}
           </div>
@@ -60,13 +82,14 @@ export default function SettingsPage() {
             <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm space-y-5">
               <div className="flex items-center gap-2 text-blue-600 font-bold border-b border-gray-100 pb-3">
                 <Building2 className="w-5 h-5" />
-                <h3 className="text-base text-gray-900">Profil, Brand & Alamat ISP (Tampil di Invoice & Header)</h3>
+                <h3 className="text-base text-gray-900">Profil, Brand & Logo Custom (Tampil di Invoice & Header)</h3>
               </div>
 
-              {/* Logo Choice */}
-              <div>
-                <label className="block text-xs font-bold text-gray-700 uppercase mb-2">Pilih Logo Brand ISP *</label>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              {/* Logo Choice & PNG File Upload */}
+              <div className="space-y-3">
+                <label className="block text-xs font-bold text-gray-700 uppercase">Pilih Logo Brand ISP Atau Upload File PNG *</label>
+
+                <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
                   {[
                     { id: 'wifi', name: 'Wifi Icon', icon: Wifi },
                     { id: 'globe', name: 'Globe Icon', icon: Globe },
@@ -80,7 +103,7 @@ export default function SettingsPage() {
                         key={item.id}
                         type="button"
                         onClick={() => setSettings({ ...settings, logoType: item.id as any })}
-                        className={`p-3 rounded-xl border flex items-center gap-2 text-xs font-bold transition-all ${
+                        className={`p-3 rounded-xl border flex items-center justify-center gap-2 text-xs font-bold transition-all ${
                           isSelected
                             ? 'bg-blue-50 border-blue-600 text-blue-700 ring-2 ring-blue-600/20'
                             : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
@@ -93,6 +116,79 @@ export default function SettingsPage() {
                       </button>
                     );
                   })}
+
+                  {/* Option for Custom PNG Upload */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const input = document.getElementById('png-file-input');
+                      if (input) input.click();
+                    }}
+                    className={`p-3 rounded-xl border flex items-center justify-center gap-2 text-xs font-bold transition-all ${
+                      settings.logoType === 'custom'
+                        ? 'bg-purple-50 border-purple-600 text-purple-700 ring-2 ring-purple-600/20'
+                        : 'bg-white border-dashed border-gray-300 text-gray-600 hover:bg-gray-50'
+                    }`}
+                  >
+                    <div className={`p-1.5 rounded-lg ${settings.logoType === 'custom' ? 'bg-purple-600 text-white' : 'bg-purple-100 text-purple-600'}`}>
+                      <ImageIcon className="w-4 h-4" />
+                    </div>
+                    <span>{settings.customLogoUrl ? 'Logo PNG Aktif' : 'Upload PNG'}</span>
+                  </button>
+                </div>
+
+                {/* File Input Element */}
+                <input
+                  id="png-file-input"
+                  type="file"
+                  accept="image/png, image/jpeg, image/svg+xml"
+                  onChange={handleFileUpload}
+                  className="hidden"
+                />
+
+                {/* Upload Box Dropzone & Preview */}
+                <div className="p-4 rounded-xl border border-dashed border-gray-300 bg-gray-50/50 flex flex-col sm:flex-row items-center justify-between gap-4">
+                  <div className="flex items-center gap-3">
+                    {settings.customLogoUrl ? (
+                      <div className="w-14 h-14 rounded-xl border border-gray-200 bg-white p-1.5 flex items-center justify-center shadow-xs">
+                        <img src={settings.customLogoUrl} alt="Preview Logo ISP" className="w-full h-full object-contain" />
+                      </div>
+                    ) : (
+                      <div className="w-12 h-12 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center border border-purple-100">
+                        <Upload className="w-6 h-6" />
+                      </div>
+                    )}
+
+                    <div>
+                      <div className="text-xs font-bold text-gray-900">
+                        {settings.customLogoUrl ? 'Logo PNG Kustom Terpasang' : 'Upload File Logo Perusahaan (PNG/JPG)'}
+                      </div>
+                      <div className="text-[11px] text-gray-500">
+                        Format PNG transparan atau SVG direkomendasikan (Ukuran maks: 2 MB)
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <label
+                      htmlFor="png-file-input"
+                      className="px-3.5 py-2 rounded-lg bg-white border border-gray-300 text-xs font-bold text-gray-700 hover:bg-gray-100 cursor-pointer transition-colors inline-flex items-center gap-1.5"
+                    >
+                      <Upload className="w-3.5 h-3.5 text-purple-600" />
+                      <span>{settings.customLogoUrl ? 'Ganti Logo PNG' : 'Pilih File PNG'}</span>
+                    </label>
+
+                    {settings.customLogoUrl && (
+                      <button
+                        type="button"
+                        onClick={() => setSettings({ ...settings, logoType: 'wifi', customLogoUrl: '' })}
+                        className="p-2 rounded-lg text-red-600 hover:bg-red-50 border border-red-200"
+                        title="Hapus Logo PNG Kustom"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
 
@@ -161,7 +257,6 @@ export default function SettingsPage() {
                 <h3 className="text-base text-gray-900">Rekening Bank Tujuan Pembayaran (Otomatis Masuk Invoice Penagihan)</h3>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Bank BCA */}
                 <div className="p-4 bg-gray-50 rounded-xl border border-gray-200 space-y-3">
                   <div className="text-xs font-extrabold text-blue-700 uppercase tracking-wider">Rekening Bank 1 (BCA)</div>
                   <div>
@@ -186,7 +281,6 @@ export default function SettingsPage() {
                   </div>
                 </div>
 
-                {/* Bank Mandiri / QRIS */}
                 <div className="p-4 bg-gray-50 rounded-xl border border-gray-200 space-y-3">
                   <div className="text-xs font-extrabold text-indigo-700 uppercase tracking-wider">Rekening Bank 2 (Mandiri / BRI / QRIS)</div>
                   <div>

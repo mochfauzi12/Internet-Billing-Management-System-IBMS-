@@ -4,7 +4,8 @@ export interface IspSettings {
   companyAddress: string;
   companyPhone: string;
   companyEmail: string;
-  logoType: 'wifi' | 'globe' | 'zap' | 'tower';
+  logoType: 'wifi' | 'globe' | 'zap' | 'tower' | 'custom';
+  customLogoUrl?: string;
   bcaAccount: string;
   bcaName: string;
   mandiriAccount: string;
@@ -19,6 +20,7 @@ export const DEFAULT_ISP_SETTINGS: IspSettings = {
   companyPhone: '0812-0000-9999',
   companyEmail: 'cs@netisp.id',
   logoType: 'wifi',
+  customLogoUrl: '',
   bcaAccount: '123-456-7890',
   bcaName: 'PT NetISP Network Indonesia',
   mandiriAccount: '098-765-4321',

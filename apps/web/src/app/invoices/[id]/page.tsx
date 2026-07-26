@@ -38,6 +38,10 @@ export default function InvoiceDetailPage({ params }: { params: { id: string } }
   };
 
   const getLogoIcon = () => {
+    if (ispSettings.logoType === 'custom' && ispSettings.customLogoUrl) {
+      return <img src={ispSettings.customLogoUrl} alt="Logo ISP" className="w-7 h-7 object-contain" />;
+    }
+
     switch (ispSettings.logoType) {
       case 'globe': return <Globe className="w-6 h-6" />;
       case 'zap': return <Zap className="w-6 h-6" />;
@@ -82,10 +86,10 @@ export default function InvoiceDetailPage({ params }: { params: { id: string } }
 
           {/* Printable Invoice Card */}
           <div className="bg-white p-6 sm:p-10 md:p-12 rounded-2xl border border-gray-200 shadow-xl space-y-8 print:border-none print:shadow-none print:p-0">
-            {/* Header Brand & Document Title (CUSTOMIZABLE VIA SETTINGS) */}
+            {/* Header Brand & Document Title (CUSTOM LOGO SUPPORTED) */}
             <div className="flex flex-col sm:flex-row justify-between items-start border-b border-gray-200 pb-6 gap-4">
               <div className="flex items-center gap-3">
-                <div className="p-3 bg-gradient-to-tr from-blue-600 to-indigo-600 rounded-xl text-white shadow-md">
+                <div className="p-3 bg-gradient-to-tr from-blue-600 to-indigo-600 rounded-xl text-white shadow-md flex items-center justify-center min-w-[48px] min-h-[48px]">
                   {getLogoIcon()}
                 </div>
                 <div>

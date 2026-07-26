@@ -40,6 +40,10 @@ export function Sidebar({ isOpen, onClose, currentPath = '/dashboard' }: Sidebar
   };
 
   const getLogoIcon = () => {
+    if (ispSettings.logoType === 'custom' && ispSettings.customLogoUrl) {
+      return <img src={ispSettings.customLogoUrl} alt="Logo ISP" className="w-5 h-5 object-contain" />;
+    }
+
     switch (ispSettings.logoType) {
       case 'globe': return <Globe className="w-5 h-5" />;
       case 'zap': return <Zap className="w-5 h-5" />;
@@ -53,7 +57,7 @@ export function Sidebar({ isOpen, onClose, currentPath = '/dashboard' }: Sidebar
       <div>
         <div className="flex items-center justify-between mb-8 px-2">
           <div className="flex items-center gap-2.5">
-            <div className="p-2 bg-blue-600 rounded-lg text-white shadow-md">
+            <div className="p-2 bg-blue-600 rounded-lg text-white shadow-md flex items-center justify-center min-w-[36px] min-h-[36px]">
               {getLogoIcon()}
             </div>
             <div className="overflow-hidden">
