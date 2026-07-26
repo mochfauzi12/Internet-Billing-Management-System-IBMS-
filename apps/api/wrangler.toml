@@ -5,22 +5,22 @@ compatibility_date = "2026-07-01"
 [[d1_databases]]
 binding = "DB"
 database_name = "ibms-db"
-database_id = "local-ibms-db-id"
+database_id = "c1c9bea6-7037-42e1-a4c1-570b74e140f7"
 
-[[r2_buckets]]
-binding = "INVOICE_BUCKET"
-bucket_name = "ibms-invoices"
+# [[r2_buckets]]
+# binding = "INVOICE_BUCKET"
+# bucket_name = "ibms-invoices"
 
-[[kv_namespaces]]
-binding = "CACHE_KV"
-id = "local-ibms-kv-id"
+# [[kv_namespaces]]
+# binding = "CACHE_KV"
+# id = "local-ibms-kv-id"
 
-[[queues.producers]]
-binding = "WA_REMINDER_QUEUE"
-queue = "wa-reminder-queue"
+# [[queues.producers]]
+# binding = "WA_REMINDER_QUEUE"
+# queue = "wa-reminder-queue"
 
-[[queues.consumers]]
-queue = "wa-reminder-queue"
+# [[queues.consumers]]
+# queue = "wa-reminder-queue"
 
 [triggers]
 crons = ["0 17 1 * *"]  # tiap tgl 1, jam 00:00 WIB (UTC+7)
