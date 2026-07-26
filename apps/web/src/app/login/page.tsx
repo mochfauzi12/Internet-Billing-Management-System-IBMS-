@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Wifi, ArrowRight, Eye, EyeOff, Lock, Mail, Users, FileText, CreditCard, BarChart2, Moon, Heart } from 'lucide-react';
+import { Wifi, ArrowRight, Eye, EyeOff, Lock, Mail, Users, FileText, CreditCard, BarChart2, Heart } from 'lucide-react';
 import { apiClient } from '@/lib/api-client';
 
 export default function LoginPage() {
@@ -10,7 +10,6 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
-  const [isDarkMode, setIsDarkMode] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,18 +32,6 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-slate-50/70 font-sans flex items-center justify-center p-4 lg:p-8 relative selection:bg-blue-600 selection:text-white">
-      {/* Top Right Corner Dark Mode Button */}
-      <div className="absolute top-6 right-6 z-20">
-        <button
-          type="button"
-          onClick={() => setIsDarkMode(!isDarkMode)}
-          className="px-4 py-2 bg-white/90 hover:bg-white border border-slate-200 shadow-sm rounded-full text-xs font-bold text-slate-700 flex items-center gap-2 transition-all"
-        >
-          <Moon className="w-3.5 h-3.5 text-slate-600" />
-          <span>Mode Gelap</span>
-        </button>
-      </div>
-
       <div className="w-full max-w-[1240px] grid grid-cols-1 lg:grid-cols-12 gap-8 items-center min-h-[720px]">
         {/* ================= PANEL KIRI: HERO & FEATURES & DASHBOARD SHOWCASE (7 KOLOM) ================= */}
         <div className="lg:col-span-7 space-y-8 pr-0 lg:pr-6">
@@ -169,7 +156,7 @@ export default function LoginPage() {
 
               <div className="space-y-1">
                 <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-                  Selamat Datang Kembali! 👋
+                  Selamat Datang Kembali!
                 </h2>
                 <p className="text-xs sm:text-sm text-slate-500 font-medium">
                   Silakan masuk untuk melanjutkan ke dashboard NetISP
@@ -296,17 +283,6 @@ export default function LoginPage() {
               </svg>
               <span>Lanjutkan dengan Google</span>
             </button>
-
-            {/* Bottom Security Notice Box */}
-            <div className="p-3.5 rounded-2xl bg-indigo-50/70 border border-indigo-100 flex items-center gap-3 text-indigo-900">
-              <div className="p-2.5 rounded-xl bg-purple-100 text-purple-600 flex-shrink-0">
-                <Lock className="w-4 h-4" />
-              </div>
-              <div className="leading-tight">
-                <div className="font-extrabold text-xs text-indigo-950">Akses Aman</div>
-                <div className="text-[11px] text-indigo-700 mt-0.5">Data Anda terenkripsi dan aman bersama NetISP</div>
-              </div>
-            </div>
 
             {/* Copyright Footer */}
             <div className="pt-2 text-center text-[11px] text-slate-400 font-medium">
