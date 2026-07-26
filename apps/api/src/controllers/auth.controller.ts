@@ -42,6 +42,19 @@ authRoutes.post('/login', async (c) => {
   });
 });
 
+authRoutes.post('/logout', async (c) => {
+  const container = createContainer(c.env);
+  const authHeader = c.req.header('Authorization');
+
+  if (authHeader) {
+    const token = authHeader.replace('Bearer ', '');
+    // Blacklist token in Cloudflare KV
+    await container.cacheService.set(`blacklist:${token}`, true, 86400);
+  }
+
+  return c.json({ message: 'Logout berhasil.' });
+});
+
 authRoutes.get('/me', async (c) => {
   return c.json({
     user: {

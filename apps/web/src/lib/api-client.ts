@@ -21,6 +21,7 @@ export const apiClient = {
   // Auth
   login: (credentials: { email: string; password: string }) =>
     fetchApi<{ token: string; user: any }>('/auth/login', { method: 'POST', body: JSON.stringify(credentials) }),
+  logout: () => fetchApi<{ message: string }>('/auth/logout', { method: 'POST' }),
   getMe: () => fetchApi<{ user: any }>('/auth/me'),
 
   // Customers
