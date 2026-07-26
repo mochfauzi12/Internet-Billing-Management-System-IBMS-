@@ -22,6 +22,17 @@ export class D1PaymentRepository implements IPaymentRepository {
     return res.map(this.mapToEntity);
   }
 
+  async findMany(params?: { limit?: number; offset?: number }): Promise<{ data: Payment[]; total: number }> {
+    const limit = params?.limit ?? 50;
+    const offset = params?.offset ?? 0;
+
+    const data = await this.db.select().from(payments).limit(limit).offset(offset);
+    return {
+      data: data.map(this.mapToEntity),
+      total: data.length,
+    };
+  }
+
   async create(data: Omit<Payment, 'id' | 'createdAt'>): Promise<Payment> {
     const inserted = await this.db.insert(payments).values(data).returning().get();
     return this.mapToEntity(inserted);
