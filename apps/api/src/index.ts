@@ -9,6 +9,7 @@ import { invoiceRoutes } from './controllers/invoice.controller';
 import { paymentRoutes } from './controllers/payment.controller';
 import { dashboardRoutes } from './controllers/dashboard.controller';
 import { reminderRoutes } from './controllers/reminder.controller';
+import { userRoutes } from './controllers/user.controller';
 import { processWaReminderQueue } from './queue/wa-reminder.consumer';
 import { handleMonthlyBillingCron } from './cron/monthly-billing.cron';
 
@@ -29,6 +30,7 @@ app.route('/api/invoices', invoiceRoutes);
 app.route('/api/payments', paymentRoutes);
 app.route('/api/dashboard', dashboardRoutes);
 app.route('/api/reminders', reminderRoutes);
+app.route('/api/users', userRoutes);
 
 export default {
   fetch: app.fetch,

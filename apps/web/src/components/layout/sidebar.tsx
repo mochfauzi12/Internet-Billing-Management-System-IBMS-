@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Wifi, LayoutDashboard, Users, Package, FileText, CreditCard, Bell, BarChart3, Settings } from 'lucide-react';
+import { Wifi, LayoutDashboard, Users, Package, FileText, CreditCard, Bell, BarChart3, Settings, ShieldCheck } from 'lucide-react';
 
 export function Sidebar() {
   const menuItems = [
@@ -12,6 +12,7 @@ export function Sidebar() {
     { label: 'Pembayaran', icon: CreditCard, href: '/payments' },
     { label: 'Reminder', icon: Bell, href: '/reminders' },
     { label: 'Laporan', icon: BarChart3, href: '/reports' },
+    { label: 'Pengguna', icon: ShieldCheck, href: '/users' },
     { label: 'Pengaturan', icon: Settings, href: '/settings' },
   ];
 
