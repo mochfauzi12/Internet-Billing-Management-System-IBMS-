@@ -1,8 +1,9 @@
 'use client';
 
-import React from 'react';
-import { Wifi, LayoutDashboard, Users, Package, FileText, CreditCard, Bell, BarChart3, Settings, ShieldCheck, LogOut, X } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { Wifi, Globe, Zap, Radio, LayoutDashboard, Users, Package, FileText, CreditCard, Bell, BarChart3, Settings, ShieldCheck, LogOut, X } from 'lucide-react';
 import { apiClient } from '@/lib/api-client';
+import { getIspSettings, DEFAULT_ISP_SETTINGS, IspSettings } from '@/lib/settings-store';
 
 interface SidebarProps {
   isOpen?: boolean;
@@ -11,6 +12,12 @@ interface SidebarProps {
 }
 
 export function Sidebar({ isOpen, onClose, currentPath = '/dashboard' }: SidebarProps) {
+  const [ispSettings, setIspSettings] = useState<IspSettings>(DEFAULT_ISP_SETTINGS);
+
+  useEffect(() => {
+    setIspSettings(getIspSettings());
+  }, []);
+
   const menuItems = [
     { label: 'Dashboard', icon: LayoutDashboard, href: '/dashboard' },
     { label: 'Pelanggan', icon: Users, href: '/customers' },
@@ -32,17 +39,28 @@ export function Sidebar({ isOpen, onClose, currentPath = '/dashboard' }: Sidebar
     window.location.href = '/login';
   };
 
+  const getLogoIcon = () => {
+    switch (ispSettings.logoType) {
+      case 'globe': return <Globe className="w-5 h-5" />;
+      case 'zap': return <Zap className="w-5 h-5" />;
+      case 'tower': return <Radio className="w-5 h-5" />;
+      default: return <Wifi className="w-5 h-5" />;
+    }
+  };
+
   const navContent = (
     <div className="h-full flex flex-col justify-between p-4">
       <div>
         <div className="flex items-center justify-between mb-8 px-2">
-          <div className="flex items-center gap-2">
-            <div className="p-2 bg-blue-600 rounded-lg text-white">
-              <Wifi className="w-5 h-5" />
+          <div className="flex items-center gap-2.5">
+            <div className="p-2 bg-blue-600 rounded-lg text-white shadow-md">
+              {getLogoIcon()}
             </div>
-            <div>
-              <h1 className="font-bold text-gray-900 leading-none">NetISP</h1>
-              <span className="text-xs text-gray-500">Service Provider</span>
+            <div className="overflow-hidden">
+              <h1 className="font-extrabold text-gray-900 leading-none truncate max-w-[130px]" title={ispSettings.companyName}>
+                {ispSettings.companyName}
+              </h1>
+              <span className="text-[10px] font-medium text-gray-500 block truncate">Service Provider</span>
             </div>
           </div>
           {onClose && (

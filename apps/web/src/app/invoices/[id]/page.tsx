@@ -1,14 +1,15 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Sidebar } from '@/components/layout/sidebar';
 import { Topbar } from '@/components/layout/topbar';
 import { BottomNav } from '@/components/layout/bottom-nav';
 import { Button } from '@/components/ui/button';
 import { StatusBadge } from '@/components/ui/badge';
 import { MOCK_INVOICES } from '@/lib/mock-data';
-import { Wifi, Send, Printer, ArrowLeft, CheckCircle2, AlertCircle, CreditCard, Building2 } from 'lucide-react';
+import { Wifi, Globe, Zap, Radio, Send, Printer, ArrowLeft, CheckCircle2, AlertCircle, CreditCard, Building2 } from 'lucide-react';
 import { WhatsAppPreviewModal } from '@/components/modules/whatsapp-preview-modal';
+import { getIspSettings, DEFAULT_ISP_SETTINGS, IspSettings } from '@/lib/settings-store';
 
 export default function InvoiceDetailPage({ params }: { params: { id: string } }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -17,6 +18,13 @@ export default function InvoiceDetailPage({ params }: { params: { id: string } }
 
   const [invoice, setInvoice] = useState(initialInvoice);
   const [isWaModalOpen, setIsWaModalOpen] = useState(false);
+
+  // Dynamic ISP Profile & Bank Settings State
+  const [ispSettings, setIspSettings] = useState<IspSettings>(DEFAULT_ISP_SETTINGS);
+
+  useEffect(() => {
+    setIspSettings(getIspSettings());
+  }, []);
 
   const isPaid = invoice.status === 'LUNAS';
 
@@ -27,6 +35,15 @@ export default function InvoiceDetailPage({ params }: { params: { id: string } }
       paidAt: new Date().toISOString().slice(0, 10),
     });
     alert(`Status invoice ${invoice.invoiceNumber} berhasil diubah menjadi LUNAS!`);
+  };
+
+  const getLogoIcon = () => {
+    switch (ispSettings.logoType) {
+      case 'globe': return <Globe className="w-6 h-6" />;
+      case 'zap': return <Zap className="w-6 h-6" />;
+      case 'tower': return <Radio className="w-6 h-6" />;
+      default: return <Wifi className="w-6 h-6" />;
+    }
   };
 
   return (
@@ -65,16 +82,16 @@ export default function InvoiceDetailPage({ params }: { params: { id: string } }
 
           {/* Printable Invoice Card */}
           <div className="bg-white p-6 sm:p-10 md:p-12 rounded-2xl border border-gray-200 shadow-xl space-y-8 print:border-none print:shadow-none print:p-0">
-            {/* Header Brand & Document Title */}
+            {/* Header Brand & Document Title (CUSTOMIZABLE VIA SETTINGS) */}
             <div className="flex flex-col sm:flex-row justify-between items-start border-b border-gray-200 pb-6 gap-4">
               <div className="flex items-center gap-3">
                 <div className="p-3 bg-gradient-to-tr from-blue-600 to-indigo-600 rounded-xl text-white shadow-md">
-                  <Wifi className="w-6 h-6" />
+                  {getLogoIcon()}
                 </div>
                 <div>
-                  <h1 className="text-xl font-extrabold text-gray-900">NetISP</h1>
-                  <p className="text-xs font-semibold text-gray-500">PT NetISP Network Indonesia</p>
-                  <p className="text-xs text-gray-400">Jl. Teknologi No. 100, Bandung • CS WA: 0812-0000-9999</p>
+                  <h1 className="text-xl font-extrabold text-gray-900">{ispSettings.companyName}</h1>
+                  <p className="text-xs font-semibold text-gray-500">{ispSettings.legalName}</p>
+                  <p className="text-xs text-gray-400">{ispSettings.companyAddress} • CS WA: {ispSettings.companyPhone}</p>
                 </div>
               </div>
 
@@ -160,7 +177,7 @@ export default function InvoiceDetailPage({ params }: { params: { id: string } }
               </div>
             </div>
 
-            {/* Dynamic Status Banner: Penagihan vs Kwitansi Lunas */}
+            {/* Dynamic Status Banner & CUSTOM BANK ACCOUNTS INTEGRATION */}
             {isPaid ? (
               <div className="p-5 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-900 text-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
@@ -183,24 +200,25 @@ export default function InvoiceDetailPage({ params }: { params: { id: string } }
                   <span>INSTRUKSI PEMBAYARAN PENAGIHAN (BELUM BAYAR)</span>
                 </div>
                 <p className="text-xs text-amber-800 leading-relaxed">
-                  Mohon lakukan pembayaran sebelum jatuh tempo (<span className="font-bold">{invoice.dueDate}</span>) melalui transfer bank atau QRIS resmi NetISP:
+                  Mohon lakukan pembayaran sebelum jatuh tempo (<span className="font-bold">{invoice.dueDate}</span>) melalui transfer bank atau QRIS resmi {ispSettings.companyName}:
                 </p>
 
+                {/* DYNAMIC BANK ACCOUNTS FROM SETTINGS */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1 text-xs">
                   <div className="p-3 bg-white rounded-lg border border-amber-200/80 space-y-1">
                     <div className="flex items-center gap-1.5 font-bold text-gray-800">
                       <Building2 className="w-4 h-4 text-blue-600" /> Bank BCA
                     </div>
-                    <div className="font-mono font-extrabold text-blue-700 text-sm">123-456-7890</div>
-                    <div className="text-[11px] text-gray-500">a.n PT NetISP Network Indonesia</div>
+                    <div className="font-mono font-extrabold text-blue-700 text-sm">{ispSettings.bcaAccount}</div>
+                    <div className="text-[11px] text-gray-500">a.n {ispSettings.bcaName}</div>
                   </div>
 
                   <div className="p-3 bg-white rounded-lg border border-amber-200/80 space-y-1">
                     <div className="flex items-center gap-1.5 font-bold text-gray-800">
-                      <CreditCard className="w-4 h-4 text-indigo-600" /> Bank Mandiri
+                      <CreditCard className="w-4 h-4 text-indigo-600" /> Bank Mandiri / QRIS
                     </div>
-                    <div className="font-mono font-extrabold text-indigo-700 text-sm">098-765-4321</div>
-                    <div className="text-[11px] text-gray-500">a.n PT NetISP Network Indonesia</div>
+                    <div className="font-mono font-extrabold text-indigo-700 text-sm">{ispSettings.mandiriAccount}</div>
+                    <div className="text-[11px] text-gray-500">a.n {ispSettings.mandiriName}</div>
                   </div>
                 </div>
               </div>
@@ -208,7 +226,7 @@ export default function InvoiceDetailPage({ params }: { params: { id: string } }
 
             {/* Footer */}
             <div className="text-center pt-6 border-t border-gray-100 text-xs text-gray-400 font-medium">
-              Dokumen ini diterbitkan secara sah oleh sistem billing otomatis NetISP. Terima kasih telah memilih layanan kami.
+              Dokumen ini diterbitkan secara sah oleh sistem billing otomatis {ispSettings.companyName}. Terima kasih telah memilih layanan kami.
             </div>
           </div>
         </main>
